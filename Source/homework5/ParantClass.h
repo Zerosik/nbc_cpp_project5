@@ -21,9 +21,10 @@ private:
 	int moveCount = 0;
 	int eventCount = 0;
 	double totalMoveDist = 0.f;
-	FVector TargetLocation;
-	FRotator TargetRotation;
-	FVector StartLocation;
+	FVector targetLocation;
+	FRotator targetRotation;
+	FVector startLocation;
+	FVector positionBefore;
 	bool isRotating = false;
 	double distanceTrabled = 0.f;
 
@@ -33,8 +34,8 @@ private:
 	void getRandomTargetPosition();
 	//void setRandomDirection();
 	//void setRandomDistance();
-	void Move(float DeltaTime);
-	void Turn(float DeltaTime);
+	void move(float DeltaTime);
+	void turn(float DeltaTime);
 public:	
 	// Sets default values for this actor's properties
 	AParantClass();

@@ -15,7 +15,8 @@ AParantClass::AParantClass()
 void AParantClass::BeginPlay()
 {
 	Super::BeginPlay();
-	StartLocation = GetActorLocation();
+	startLocation = GetActorLocation();
+	positionBefore = GetActorLocation();
 	//setRandomDirection();
 	//setRandomDistance();
 	getRandomTargetPosition();
@@ -26,12 +27,14 @@ void AParantClass::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	totalMoveDist += FVector::Dist(GetActorLocation(), positionBefore);
+	positionBefore = GetActorLocation();
 	printActorLocation();
 	if (moveCount < 10) {
 		if (isRotating)
-			Turn(DeltaTime);
+			turn(DeltaTime);
 		else
-			Move(DeltaTime);
+			move(DeltaTime);
 	}
 	else {
 
@@ -50,7 +53,7 @@ void AParantClass::printActorLocation()
 
 void AParantClass::printNextLocation()
 {
-	FString DebugMsg = FString::Printf(TEXT("다음 지점 X : %.2f,X : %.2f,X : %.2f"), TargetLocation.X, TargetLocation.Y, TargetLocation.Z);
+	FString DebugMsg = FString::Printf(TEXT("다음 지점 X : %.2f,X : %.2f,X : %.2f"), targetLocation.X, targetLocation.Y, targetLocation.Z);
 	GEngine->AddOnScreenDebugMessage(2, 5, FColor::Green, DebugMsg);
 }
 
@@ -67,15 +70,15 @@ void AParantClass::getRandomTargetPosition()
 {
 	// 초기 지점 기준 반경 1000 이내의 랜덤 지점 생성
 	// VRAND()로 랜덤 0~1사이를 가진 3차원 벡터 * 1000거리를 곱해 지점 생성.
-	FVector RandomOffset = FMath::VRand() * FMath::RandRange(0.f, 1000.f);
+	FVector randomOffset = FMath::VRand() * FMath::RandRange(0.f, 1000.f);
 	//시작지점에 값을더해서 시작지점 주변에서만 움직이도록.
-	TargetLocation = StartLocation + RandomOffset;
+	targetLocation = targetLocation + randomOffset;
 
 	// 현재 위치에서 목표 지점을 바라보는 회전값 가져오기
 	// #include "Kismet/KismetMathLibrary.h" 필수. 헤더에 가져오면 오류나니 참고.
 	// FindLookAtRotation(시작점, 목표점)
-	TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
-	totalMoveDist += FVector::Dist(GetActorLocation(), TargetLocation);
+	targetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), targetLocation);
+	
 	eventTrigger();
 	printNextLocation();
 }
@@ -102,13 +105,13 @@ void AParantClass::getRandomTargetPosition()
 //
 //}
 
-void AParantClass::Move(float DeltaTime) {
+void AParantClass::move(float DeltaTime) {
 	// 액터의 현재 위치
 	FVector CurrentLoc = GetActorLocation();
 	// Vector-Interp-to, 벡터값 보간방식, 
-	FVector NextLoc = FMath::VInterpTo(CurrentLoc, TargetLocation, DeltaTime, 5.f);
+	FVector NextLoc = FMath::VInterpTo(CurrentLoc, targetLocation, DeltaTime, 5.f);
 	SetActorLocation(NextLoc);
-	if (FVector::Dist(CurrentLoc, TargetLocation) < 10.f)
+	if (FVector::Dist(CurrentLoc, targetLocation) < 10.f)
 	{
 		//setRandomDirection();//다음에 회전할 위치 설정
 		moveCount += 1;
@@ -119,13 +122,13 @@ void AParantClass::Move(float DeltaTime) {
 	}
 }
 
-void AParantClass::Turn(float DeltaTime) {
+void AParantClass::turn(float DeltaTime) {
 	// 액터의 현재 회전값
 	FRotator CurrentRot = GetActorRotation();
 	// Rotate-Interp-to, 회전값 보간방식, 
-	FRotator NextRot = FMath::RInterpTo(CurrentRot, TargetRotation, DeltaTime, 5.f);
+	FRotator NextRot = FMath::RInterpTo(CurrentRot, targetRotation, DeltaTime, 5.f);
 	SetActorRotation(NextRot);
-	if (CurrentRot.Equals(TargetRotation, 1.0f))
+	if (CurrentRot.Equals(targetRotation, 1.0f))
 	{
 		//setRandomDistance();//다음에 이동할 위치 설정후
 		isRotating = false;//이동 호출하도록 
