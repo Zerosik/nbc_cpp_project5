@@ -93,7 +93,8 @@ void AParantClass::getRandomTargetPosition()
 //	double randomYaw = FMath::RandRange(0.f, 360.f);
 //	double randomPitch = FMath::RandRange(0.f, 360.f);
 //	double randomRoll = FMath::RandRange(0.f, 360.f);
-//	//TargetRotation = FRotator{ randomPitch, randomYaw, randomRoll };
+//  // 2개이상의 회전값을 쓰면 왜 회전이 멈추지 않는지??
+//	// TargetRotation = FRotator{ randomPitch, randomYaw, randomRoll };
 //	TargetRotation = FRotator{ 0, randomYaw, 0 };\
 //}
 //
@@ -113,11 +114,10 @@ void AParantClass::move(float DeltaTime) {
 	SetActorLocation(NextLoc);
 	if (FVector::Dist(CurrentLoc, targetLocation) < 10.f)
 	{
-		//setRandomDirection();//다음에 회전할 위치 설정
 		moveCount += 1;
 		if (moveCount < 10) {
 			getRandomTargetPosition();// 목표 지점 초기화
-			isRotating = true;//다음부터 회전 호출하도록
+			isRotating = true;// 다음부터 회전 호출하도록
 		}
 	}
 }
@@ -130,7 +130,6 @@ void AParantClass::turn(float DeltaTime) {
 	SetActorRotation(NextRot);
 	if (CurrentRot.Equals(targetRotation, 1.0f))
 	{
-		//setRandomDistance();//다음에 이동할 위치 설정후
-		isRotating = false;//이동 호출하도록 
+		isRotating = false;// 이동 호출하도록
 	}
 }
