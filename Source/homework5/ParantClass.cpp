@@ -35,6 +35,10 @@ void AParantClass::Tick(float DeltaTime)
 			turn(DeltaTime);
 		else
 			move(DeltaTime);
+
+
+		FString DebugMsg = FString::Printf(TEXT("누적 이동거리 : %.2f, 50%% 확률 이벤트 횟수 : %.d"), totalMoveDist, eventCount);
+		GEngine->AddOnScreenDebugMessage(3, 10, FColor::Yellow, DebugMsg);
 	}
 	else {
 
@@ -47,22 +51,29 @@ void AParantClass::Tick(float DeltaTime)
 void AParantClass::printActorLocation()
 {
 	FVector location = GetActorLocation();
-	FString DebugMsg = FString::Printf(TEXT("현재 위치 X : %.2f,X : %.2f,X : %.2f | %d번째 이동."), location.X, location.Y, location.Z, moveCount+1);
-	GEngine->AddOnScreenDebugMessage(1, 5, FColor::Red, DebugMsg);
+	int movePrintVal = moveCount < 10 ? moveCount + 1 : 10;
+	FString DebugMsg = FString::Printf(TEXT("현재 위치 X : %.2f,X : %.2f,X : %.2f | %d번째 이동."), location.X, location.Y, location.Z, movePrintVal);
+	GEngine->AddOnScreenDebugMessage(5, 5, FColor::Red, DebugMsg);
 }
 
 void AParantClass::printNextLocation()
 {
 	FString DebugMsg = FString::Printf(TEXT("다음 지점 X : %.2f,X : %.2f,X : %.2f"), targetLocation.X, targetLocation.Y, targetLocation.Z);
-	GEngine->AddOnScreenDebugMessage(2, 5, FColor::Green, DebugMsg);
+	GEngine->AddOnScreenDebugMessage(4, 5, FColor::Green, DebugMsg);
 }
+
 
 void AParantClass::eventTrigger()
 {
 	// 50% 이벤트 트리거?
 	int trigger = FMath::RandRange(0, 1);
-	if (trigger == 1)
+	if (trigger == 1) {
 		eventCount += 1;
+
+		FString DebugMsg = FString::Printf(TEXT("50%% 확률 이벤트 발생"));
+		GEngine->AddOnScreenDebugMessage(1, 1, FColor::Green, DebugMsg);
+
+	}
 }
 
 
